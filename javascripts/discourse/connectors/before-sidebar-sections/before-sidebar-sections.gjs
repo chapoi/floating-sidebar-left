@@ -1,8 +1,11 @@
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
 import { run } from "@ember/runloop";
+import { service } from "@ember/service";
 
 export default class CloseOnClick extends Component {
+  @service router;
+
   handleClickOutside = (event) => {
     let floatingSidebar = document.getElementById("d-sidebar");
     let toggleButton = document.querySelector(".header-sidebar-toggle");
@@ -17,6 +20,20 @@ export default class CloseOnClick extends Component {
       });
     }
   };
+
+  constructor() {
+    super(...arguments);
+    this.router.on("routeDidChange", this.handleRouteChange);
+  }
+
+  @action
+  handleRouteChange() {
+    if (document.getElementById("d-sidebar")) {
+      run(() => {
+        Discourse.lookup("controller:application").toggleSidebar();
+      });
+    }
+  }
 
   @action
   sidebarVisible() {
